@@ -1,6 +1,9 @@
 ﻿using Physics.Components;
 using Simulation;
 using System;
+using System.Numerics;
+using Transforms;
+using Transforms.Components;
 using Unmanaged;
 
 namespace Physics
@@ -8,6 +11,12 @@ namespace Physics
     public readonly struct Raycaster : IEntity
     {
         private readonly Entity entity;
+
+        public readonly bool IsEnabled
+        {
+            get => entity.IsEnabled;
+            set => entity.IsEnabled = value;
+        }
 
         public readonly ref float MaxDistance
         {
@@ -48,6 +57,15 @@ namespace Physics
             }
         }
 
+        public readonly ref RaycastHitCallback Callback
+        {
+            get
+            {
+                ref IsRaycaster component = ref entity.GetComponent<IsRaycaster>();
+                return ref component.callback;
+            }
+        }
+
         eint IEntity.Value => entity;
         World IEntity.World => entity;
 
@@ -59,10 +77,18 @@ namespace Physics
         }
 #endif
 
-        public Raycaster(World world, float maxDistance)
+        public Raycaster(World world, eint existingEntity)
+        {
+            entity = new(world, existingEntity);
+        }
+
+        public Raycaster(World world, Vector3 position, Quaternion rotation, float maxDistance = 1000f)
         {
             entity = new(world);
-            entity.AddComponent(new IsRaycaster(maxDistance));
+            entity.AddComponent(new IsRaycaster(maxDistance, default));
+            entity.AddComponent(new IsTransform());
+            entity.AddComponent(new Position(position));
+            entity.AddComponent(new Rotation(rotation));
         }
 
         Query IEntity.GetQuery(World world)
@@ -73,6 +99,11 @@ namespace Physics
         public static implicit operator Entity(Raycaster raycaster)
         {
             return raycaster.entity;
+        }
+
+        public static implicit operator Transform(Raycaster raycaster)
+        {
+            return raycaster.entity.As<Transform>();
         }
     }
 }
