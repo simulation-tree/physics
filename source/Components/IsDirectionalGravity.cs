@@ -1,6 +1,6 @@
 ﻿namespace Physics.Components
 {
-    public struct DirectionalGravity
+    public struct IsDirectionalGravity
     {
     }
 }

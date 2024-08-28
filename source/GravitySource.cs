@@ -14,12 +14,12 @@ namespace Physics
 
         public readonly bool IsDirectional
         {
-            get => entity.ContainsComponent<DirectionalGravity>();
+            get => entity.ContainsComponent<IsDirectionalGravity>();
         }
 
         public readonly bool IsPoint
         {
-            get => entity.ContainsComponent<PointGravity>();
+            get => entity.ContainsComponent<IsPointGravity>();
         }
 
         public readonly ref float Force
@@ -38,28 +38,9 @@ namespace Physics
         }
 #endif
 
-        /// <summary>
-        /// Creates a directional gravity source.
-        /// </summary>
-        public GravitySource(World world, Quaternion rotation, float force = 9.8067f)
+        public GravitySource(World world, eint existingEntity)
         {
-            entity = new(world);
-            entity.AddComponent(new IsGravitySource(force));
-            entity.AddComponent(new DirectionalGravity());
-            entity.AddComponent(new Rotation(rotation));
-            entity.AddComponent(new IsTransform());
-        }
-
-        /// <summary>
-        /// Creates a point gravity source.
-        /// </summary>
-        public GravitySource(World world, Vector3 position, float radius, float force)
-        {
-            entity = new(world);
-            entity.AddComponent(new IsGravitySource(force));
-            entity.AddComponent(new PointGravity(radius));
-            entity.AddComponent(new Position(position));
-            entity.AddComponent(new IsTransform());
+            entity = new(world, existingEntity);
         }
 
         Query IEntity.GetQuery(World world)
@@ -75,6 +56,52 @@ namespace Physics
         public static implicit operator Transform(GravitySource gravity)
         {
             return gravity.entity.As<Transform>();
+        }
+    }
+
+    public readonly struct DirectionalGravity : IEntity
+    {
+        private readonly GravitySource gravity;
+
+        eint IEntity.Value => (Entity)gravity;
+        World IEntity.World => (Entity)gravity;
+
+#if NET
+        [Obsolete("Default constructor not available", true)]
+        public DirectionalGravity()
+        {
+            throw new NotSupportedException();
+        }
+#endif
+
+        public DirectionalGravity(World world, Quaternion rotation, float force = 9.8067f)
+        {
+            Entity entity = new(world);
+            entity.AddComponent(new IsGravitySource(force));
+            entity.AddComponent(new IsDirectionalGravity());
+            entity.AddComponent(new IsTransform());
+            entity.AddComponent(new Rotation(rotation));
+            gravity = entity.As<GravitySource>();
+        }
+
+        Query IEntity.GetQuery(World world)
+        {
+            return new(world, RuntimeType.Get<IsDirectionalGravity>());
+        }
+
+        public static implicit operator GravitySource(DirectionalGravity gravity)
+        {
+            return gravity.gravity;
+        }
+
+        public static implicit operator Entity(DirectionalGravity gravity)
+        {
+            return gravity.gravity;
+        }
+
+        public static implicit operator Transform(DirectionalGravity gravity)
+        {
+            return gravity.gravity;
         }
     }
 }

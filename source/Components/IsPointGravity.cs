@@ -2,19 +2,19 @@
 
 namespace Physics.Components
 {
-    public struct PointGravity
+    public struct IsPointGravity
     {
         public float radius;
 
 #if NET
         [Obsolete("Default constructor not available", true)]
-        public PointGravity()
+        public IsPointGravity()
         {
             throw new NotSupportedException();
         }
 #endif
 
-        public PointGravity(float radius)
+        public IsPointGravity(float radius)
         {
             this.radius = radius;
         }

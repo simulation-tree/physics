@@ -29,18 +29,9 @@ namespace Physics
         }
 #endif
 
-        public Shape(World world, CubeShape cube, Vector3 offset = default)
+        public Shape(World world, eint existingEntity)
         {
-            entity = new(world);
-            entity.AddComponent(cube);
-            entity.AddComponent(new IsShape(offset));
-        }
-
-        public Shape(World world, SphereShape sphere, Vector3 offset = default)
-        {
-            entity = new(world);
-            entity.AddComponent(sphere);
-            entity.AddComponent(new IsShape(offset));
+            entity = new(world, existingEntity);
         }
 
         Query IEntity.GetQuery(World world)
