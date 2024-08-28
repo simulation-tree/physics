@@ -12,11 +12,19 @@ namespace Physics
     {
         private readonly Entity entity;
 
-        public readonly ref Vector3 Velocity
+        public readonly ref Vector3 LinearVelocity
         {
             get
             {
                 return ref entity.GetComponent<LinearVelocity>().value;
+            }
+        }
+
+        public readonly ref Vector3 AngularVelocity
+        {
+            get
+            {
+                return ref entity.GetComponent<AngularVelocity>().value;
             }
         }
 
@@ -105,6 +113,7 @@ namespace Physics
             rint shapeReference = entity.AddReference(shape);
             entity.AddComponent(new IsBody(shapeReference, type));
             entity.AddComponent(new LinearVelocity(initialVelocity));
+            entity.AddComponent(new AngularVelocity());
             entity.AddComponent(Components.GravityScale.Default);
             entity.AddComponent(Components.Mass.Default);
             entity.AddComponent(new Position());
