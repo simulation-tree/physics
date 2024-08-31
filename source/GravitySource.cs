@@ -27,7 +27,7 @@ namespace Physics
             get => ref entity.GetComponent<IsGravitySource>().force;
         }
 
-        eint IEntity.Value => entity;
+        uint IEntity.Value => entity;
         World IEntity.World => entity;
 
 #if NET
@@ -38,7 +38,7 @@ namespace Physics
         }
 #endif
 
-        public GravitySource(World world, eint existingEntity)
+        public GravitySource(World world, uint existingEntity)
         {
             entity = new(world, existingEntity);
         }
@@ -63,7 +63,7 @@ namespace Physics
     {
         private readonly GravitySource gravity;
 
-        eint IEntity.Value => (Entity)gravity;
+        uint IEntity.Value => (Entity)gravity;
         World IEntity.World => (Entity)gravity;
 
 #if NET

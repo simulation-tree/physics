@@ -18,7 +18,7 @@ namespace Physics
             }
         }
 
-        eint IEntity.Value => entity;
+        uint IEntity.Value => entity;
         World IEntity.World => entity;
 
 #if NET
@@ -29,7 +29,7 @@ namespace Physics
         }
 #endif
 
-        public Shape(World world, eint existingEntity)
+        public Shape(World world, uint existingEntity)
         {
             entity = new(world, existingEntity);
         }

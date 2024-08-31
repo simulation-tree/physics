@@ -1,22 +1,21 @@
-﻿using Simulation;
-using System;
+﻿using System;
 using System.Numerics;
 
-namespace Physics.Components
+namespace Physics
 {
     public struct RaycastHit
     {
         public Vector3 point;
         public Vector3 normal;
         public float distance;
-        public eint targetEntity;
+        public uint entity;
 
-        public RaycastHit(Vector3 point, Vector3 normal, float distance, eint targetEntity)
+        public RaycastHit(Vector3 point, Vector3 normal, float distance, uint targetEntity)
         {
             this.point = point;
             this.normal = normal;
             this.distance = distance;
-            this.targetEntity = targetEntity;
+            this.entity = targetEntity;
         }
 
         public readonly override string ToString()
@@ -76,7 +75,7 @@ namespace Physics.Components
 
             buffer[length++] = ',';
 
-            targetEntity.TryFormat(buffer[length..], out written);
+            entity.TryFormat(buffer[length..], out written);
             length += written;
 
             buffer[length++] = ')';

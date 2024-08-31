@@ -28,7 +28,7 @@ namespace Physics
             }
         }
 
-        eint IEntity.Value => (Entity)shape;
+        uint IEntity.Value => (Entity)shape;
         World IEntity.World => (Entity)shape;
 
 #if NET

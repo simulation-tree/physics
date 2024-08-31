@@ -6,11 +6,13 @@ namespace Physics.Events
     {
         public readonly TimeSpan delta;
 
+#if NET
         [Obsolete("Default constructor not available", true)]
         public PhysicsUpdate()
         {
             throw new NotSupportedException();
         }
+#endif
 
         public PhysicsUpdate(TimeSpan delta)
         {

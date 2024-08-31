@@ -93,7 +93,7 @@ namespace Physics
             }
         }
 
-        eint IEntity.Value => entity;
+        uint IEntity.Value => entity;
         World IEntity.World => entity;
 
 #if NET
