@@ -1,55 +1,64 @@
 # Physics
-Simulates physics using fast abstractions for realtime speed.
+Abstraction for physics simulation.
 
-### Dependencies
-* [Simulation](https://github.com/game-simulations/simulation)
-* [Transforms](https://github.com/game-simulations/transforms)
-
-### Behaviour
-1. Entities with an `IsBody` component are automatically going to have an `IsTransform` component as well
-2. Only entities with an `IsBody` component will have collisions and gravity simulated for
-3. `Mass` component is optional and defaults to `1`, but if set to infinity then the body is static and immovable
-4. Gravity source entities are expected to be transforms, because the directional source must be oriented, and the point must be positioned
-   
-### Gravity
-For gravity, there is directional, and point gravity sources available. Directional gravity
-behaves globally and applies to all bodies. Point gravity affects ones that are within
-the defined radius.
+### Gravity sources
+There are directional and point gravity sources available. Directional gravity applies
+to all bodies, while point sources affects ones that are within their defined radius:
 ```cs
-EntityID globalGravity = world.CreateEntity();
-world.AddComponent(globalGravity, new DirectionalGravity(-9.81f));
-world.AddComponent(globalGravity, new IsTransform());
-world.AddComponent(globalGravity, new EulerAngles(Vector3.UnitY));
+using World world = new();
+DirectionalGravity globalGravity = new(world, -Vector3.UnitY);
 
 float radius = 700000f;
-EntityID planetaryGravity = world.CreateEntity();
-world.AddComponent(planetaryGravity, new IsTransform());
-world.AddComponent(planetaryGravity, new Position(0, 0, 0));
-world.AddComponent(planetaryGravity, new PointGravity(-9.81f, radius));
+Vector3 position = new(0, 0, 0);
+PointGravity planetaryGravity = new(world, position, radius);
 ```
 
-### Collisions
+### Physics bodies
+Entities that would like to have collisions simulated, or velocities advanced are
+considered _bodies_. Where they contain an `IsBody` component and are also transform entities:
 ```cs
-EntityID cube = world.CreateEntity();
-world.AddComponent(cube, new IsBody());
-world.AddComponent(cube, new IsCube());
-world.AddComponent(cube, new Position(0, 5, 0));
+//a ball that will fall
+SphereShape ballShape = new(world, 0.5f);
+Body ballBody = new(world, ballShape, IsBody.Type.Dynamic);
+Transform ballTransform = ballBody;
+ballTransform.Position = new(0, 5, 0);
+ballBody.Velocity = new(0, 4, 0);
 
-EntityID floor = world.CreateEntity();
-world.AddComponent(floor, new IsBody());
-world.AddComponent(floor, new IsCube());
-world.AddComponent(floor, new Position(0, -1, 0));
-world.AddComponent(floor, new Scale(20, 1, 20));
-world.AddComponent(floor, new Mass(Math.PositiveInfinity));
+//onto a static floor
+CubeShape floorShape = new(world, 0.5f, 0.5f, 0.5f);
+Body floorBody = new(world, floorShape, IsBody.Type.Static);
+Transform floorTransform = floorBody;
+floorTransform.Scale = new(100, 1, 100);
 
-float time = 0f;
-while (time < 5f)
+TimeSpan time = default;
+while (time.TotalSeconds < 5f)
 {
-    world.Submit(new PhysicsUpdate());
+    TimeSpan delta = TimeSpan.FromSeconds(0.2f);
+    world.Submit(new PhysicsUpdate(delta));
     world.Poll();
-    time += 0.2f;
+    time += delta;
 }
 ```
-### Line tests
+
+### Raycasts
+Raycasts are dispatched by submitting a `Raycast` event, which will be fulfilled
+at the end of a `PhysicsUpdate` event:
 ```cs
+Raycast raycast = new(new(0, 10, 0), new(0, -1, 0), new(&OnHit));
+world.Submit(raycast);
+
+[UnmanagedCallersOnly]
+private unsafe static void OnHit(World world, Raycast raycast, void* hitsPointer, int hitCount)
+{
+    Span<RaycastHit> hits = new(hitsPointer, hitCount);
+    foreach (RaycastHit hit in hits)
+    {
+        uint entityHit = hit.entity;
+        Vector3 point = hit.point;
+        Vector3 normal = hit.normal;
+    }
+}
 ```
+
+> The constructor can accept an arbitrary `identifier` value which can be used to
+differentiate between multiple raycasts

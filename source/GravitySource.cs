@@ -1,9 +1,7 @@
 ﻿using Physics.Components;
 using Simulation;
 using System;
-using System.Numerics;
 using Transforms;
-using Transforms.Components;
 using Unmanaged;
 
 namespace Physics
@@ -12,20 +10,9 @@ namespace Physics
     {
         private readonly Entity entity;
 
-        public readonly bool IsDirectional
-        {
-            get => entity.ContainsComponent<IsDirectionalGravity>();
-        }
-
-        public readonly bool IsPoint
-        {
-            get => entity.ContainsComponent<IsPointGravity>();
-        }
-
-        public readonly ref float Force
-        {
-            get => ref entity.GetComponent<IsGravitySource>().force;
-        }
+        public readonly bool IsDirectional => entity.ContainsComponent<IsDirectionalGravity>();
+        public readonly bool IsPoint => entity.ContainsComponent<IsPointGravity>();
+        public readonly ref float Force => ref entity.GetComponent<IsGravitySource>().force;
 
         uint IEntity.Value => entity;
         World IEntity.World => entity;
@@ -56,52 +43,6 @@ namespace Physics
         public static implicit operator Transform(GravitySource gravity)
         {
             return gravity.entity.As<Transform>();
-        }
-    }
-
-    public readonly struct DirectionalGravity : IEntity
-    {
-        private readonly GravitySource gravity;
-
-        uint IEntity.Value => (Entity)gravity;
-        World IEntity.World => (Entity)gravity;
-
-#if NET
-        [Obsolete("Default constructor not available", true)]
-        public DirectionalGravity()
-        {
-            throw new NotSupportedException();
-        }
-#endif
-
-        public DirectionalGravity(World world, Quaternion rotation, float force = 9.8067f)
-        {
-            Entity entity = new(world);
-            entity.AddComponent(new IsGravitySource(force));
-            entity.AddComponent(new IsDirectionalGravity());
-            entity.AddComponent(new IsTransform());
-            entity.AddComponent(new Rotation(rotation));
-            gravity = entity.As<GravitySource>();
-        }
-
-        Query IEntity.GetQuery(World world)
-        {
-            return new(world, RuntimeType.Get<IsDirectionalGravity>());
-        }
-
-        public static implicit operator GravitySource(DirectionalGravity gravity)
-        {
-            return gravity.gravity;
-        }
-
-        public static implicit operator Entity(DirectionalGravity gravity)
-        {
-            return gravity.gravity;
-        }
-
-        public static implicit operator Transform(DirectionalGravity gravity)
-        {
-            return gravity.gravity;
         }
     }
 }
