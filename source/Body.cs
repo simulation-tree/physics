@@ -12,11 +12,11 @@ namespace Physics
     {
         private readonly Entity entity;
 
-        public readonly ref Vector3 LinearVelocity => ref entity.GetComponent<LinearVelocity>().value;
-        public readonly ref Vector3 AngularVelocity => ref entity.GetComponent<AngularVelocity>().value;
-        public readonly ref float GravityScale => ref entity.GetComponent<GravityScale>().value;
-        public readonly ref float Mass => ref entity.GetComponent<Mass>().value;
-        public readonly ref Shape Shape => ref entity.GetComponent<IsBody>().shape;
+        public readonly ref Vector3 LinearVelocity => ref entity.GetComponentRef<LinearVelocity>().value;
+        public readonly ref Vector3 AngularVelocity => ref entity.GetComponentRef<AngularVelocity>().value;
+        public readonly ref float GravityScale => ref entity.GetComponentRef<GravityScale>().value;
+        public readonly ref float Mass => ref entity.GetComponentRef<Mass>().value;
+        public readonly ref Shape Shape => ref entity.GetComponentRef<IsBody>().shape;
 
         public readonly uint ContactCount => entity.GetArrayLength<CollisionContact>();
 
@@ -47,7 +47,7 @@ namespace Physics
         {
             get
             {
-                WorldBounds bounds = entity.GetComponent<WorldBounds>();
+                WorldBounds bounds = entity.GetComponentRef<WorldBounds>();
                 return (bounds.min, bounds.max);
             }
         }
@@ -70,10 +70,14 @@ namespace Physics
         {
             entity = new(world);
             entity.AddComponent(new IsBody(shape, type));
-            entity.AddComponent(new LinearVelocity(initialVelocity));
-            entity.AddComponent(new AngularVelocity());
-            entity.AddComponent(Components.GravityScale.Default);
-            entity.AddComponent(Components.Mass.Default);
+            if (type != IsBody.Type.Static)
+            {
+                entity.AddComponent(new LinearVelocity(initialVelocity));
+                entity.AddComponent(new AngularVelocity());
+                entity.AddComponent(Components.GravityScale.Default);
+                entity.AddComponent(Components.Mass.Default);
+            }
+
             entity.AddComponent(new Position());
             entity.AddComponent(new IsTransform());
         }

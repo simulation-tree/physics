@@ -12,7 +12,7 @@ namespace Physics
     {
         private readonly GravitySource gravity;
 
-        public readonly ref float Force => ref ((Entity)gravity).GetComponent<IsGravitySource>().force;
+        public readonly ref float Force => ref ((Entity)gravity).GetComponentRef<IsGravitySource>().force;
 
         uint IEntity.Value => (Entity)gravity;
         World IEntity.World => (Entity)gravity;
