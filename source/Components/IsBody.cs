@@ -1,17 +1,15 @@
-﻿using Simulation;
-
-namespace Physics.Components
+﻿namespace Physics.Components
 {
     public struct IsBody
     {
         public uint version;
-        public rint shapeReference;
+        public Shape shape;
         public Type type;
 
-        public IsBody(rint shapeReference, Type type)
+        public IsBody(Shape shape, Type type)
         {
             version = default;
-            this.shapeReference = shapeReference;
+            this.shape = shape;
             this.type = type;
         }
 

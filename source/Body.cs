@@ -12,45 +12,13 @@ namespace Physics
     {
         private readonly Entity entity;
 
-        public readonly ref Vector3 LinearVelocity
-        {
-            get
-            {
-                return ref entity.GetComponent<LinearVelocity>().value;
-            }
-        }
+        public readonly ref Vector3 LinearVelocity => ref entity.GetComponent<LinearVelocity>().value;
+        public readonly ref Vector3 AngularVelocity => ref entity.GetComponent<AngularVelocity>().value;
+        public readonly ref float GravityScale => ref entity.GetComponent<GravityScale>().value;
+        public readonly ref float Mass => ref entity.GetComponent<Mass>().value;
+        public readonly ref Shape Shape => ref entity.GetComponent<IsBody>().shape;
 
-        public readonly ref Vector3 AngularVelocity
-        {
-            get
-            {
-                return ref entity.GetComponent<AngularVelocity>().value;
-            }
-        }
-
-        public readonly ref float GravityScale
-        {
-            get
-            {
-                return ref entity.GetComponent<GravityScale>().value;
-            }
-        }
-
-        public readonly ref float Mass
-        {
-            get
-            {
-                return ref entity.GetComponent<Mass>().value;
-            }
-        }
-
-        public readonly uint ContactCount
-        {
-            get
-            {
-                return entity.GetArrayLength<CollisionContact>();
-            }
-        }
+        public readonly uint ContactCount => entity.GetArrayLength<CollisionContact>();
 
         public readonly CollisionContact this[uint index]
         {
@@ -72,15 +40,6 @@ namespace Physics
                 {
                     return Array.Empty<CollisionContact>();
                 }
-            }
-        }
-
-        public readonly Shape Shape
-        {
-            get
-            {
-                rint shapeReference = entity.GetComponent<IsBody>().shapeReference;
-                return entity.GetReference<Shape>(shapeReference);
             }
         }
 
@@ -110,8 +69,7 @@ namespace Physics
         public Body(World world, Shape shape, IsBody.Type type, Vector3 initialVelocity = default)
         {
             entity = new(world);
-            rint shapeReference = entity.AddReference(shape);
-            entity.AddComponent(new IsBody(shapeReference, type));
+            entity.AddComponent(new IsBody(shape, type));
             entity.AddComponent(new LinearVelocity(initialVelocity));
             entity.AddComponent(new AngularVelocity());
             entity.AddComponent(Components.GravityScale.Default);

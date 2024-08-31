@@ -1,81 +1,31 @@
-﻿using Physics.Components;
-using Simulation;
-using System;
-using System.Numerics;
-using Unmanaged;
+﻿using System.Numerics;
 
 namespace Physics
 {
-    public readonly struct CubeShape : IEntity
+    public readonly struct CubeShape : IShape
     {
-        private readonly Shape shape;
+        public readonly Vector3 extents;
 
-        public readonly ref Vector3 Extents
+        byte IShape.TypeIndex => 2;
+
+        public CubeShape(Vector3 extents)
         {
-            get
-            {
-                Entity entity = shape;
-                return ref entity.GetComponent<IsCubeShape>().extents;
-            }
+            this.extents = extents;
         }
 
-        public readonly ref Vector3 Offset
+        public CubeShape(float extent)
         {
-            get
-            {
-                Entity entity = shape;
-                return ref entity.GetComponent<IsShape>().offset;
-            }
+            extents = new(extent);
         }
 
-        uint IEntity.Value => (Entity)shape;
-        World IEntity.World => (Entity)shape;
-
-#if NET
-        [Obsolete("Default constructor not available", true)]
-        public CubeShape()
+        public CubeShape(float x, float y, float z)
         {
-            throw new NotSupportedException();
-        }
-#endif
-
-        public CubeShape(World world, Vector3 extents, Vector3 offset = default)
-        {
-            Entity entity = new(world);
-            entity.AddComponent(new IsShape(offset));
-            entity.AddComponent(new IsCubeShape(extents));
-            shape = entity.As<Shape>();
+            extents = new(x, y, z);
         }
 
-        public CubeShape(World world, float extent, Vector3 offset = default)
+        public static implicit operator Shape(CubeShape shape)
         {
-            Entity entity = new(world);
-            entity.AddComponent(new IsShape(offset));
-            entity.AddComponent(new IsCubeShape(extent));
-            shape = entity.As<Shape>();
-        }
-
-        public CubeShape(World world, float x, float y, float z, Vector3 offset = default)
-        {
-            Entity entity = new(world);
-            entity.AddComponent(new IsShape(offset));
-            entity.AddComponent(new IsCubeShape(x, y, z));
-            shape = entity.As<Shape>();
-        }
-
-        Query IEntity.GetQuery(World world)
-        {
-            return new(world, RuntimeType.Get<IsCubeShape>());
-        }
-
-        public static implicit operator Shape(CubeShape cube)
-        {
-            return cube.shape;
-        }
-
-        public static implicit operator Entity(CubeShape cube)
-        {
-            return cube.shape;
+            return Shape.Create(shape);
         }
     }
 }

@@ -1,47 +1,60 @@
-﻿using Physics.Components;
-using Simulation;
-using System;
+﻿using System;
+using System.Diagnostics;
 using System.Numerics;
-using Unmanaged;
+using System.Runtime.CompilerServices;
 
 namespace Physics
 {
-    public readonly struct Shape : IEntity
+    public unsafe struct Shape
     {
-        private readonly Entity entity;
+        public Vector3 offset;
+        public byte type;
 
-        public readonly ref Vector3 Offset
+        private fixed float data[5];
+
+        private Shape(byte type, float* data, Vector3 offset)
         {
-            get
+            this.type = type;
+            this.offset = offset;
+            for (int i = 0; i < 5; i++)
             {
-                return ref entity.GetComponent<IsShape>().offset;
+                this.data[i] = data[i];
             }
         }
 
-        uint IEntity.Value => entity;
-        World IEntity.World => entity;
-
-#if NET
-        [Obsolete("Default constructor not available", true)]
-        public Shape()
+        public readonly bool Is<T>(out T shape) where T : unmanaged, IShape
         {
-            throw new NotSupportedException();
-        }
-#endif
-
-        public Shape(World world, uint existingEntity)
-        {
-            entity = new(world, existingEntity);
-        }
-
-        Query IEntity.GetQuery(World world)
-        {
-            return new(world, RuntimeType.Get<IsShape>());
+            if (type == default(T).TypeIndex)
+            {
+                fixed (float* data = this.data)
+                {
+                    shape = Unsafe.Read<T>(data);
+                    return true;
+                }
+            }
+            else
+            {
+                shape = default;
+                return false;
+            }
         }
 
-        public static implicit operator Entity(Shape shape)
+        public static Shape Create<T>(T shape, Vector3 offset = default) where T : unmanaged, IShape
         {
-            return shape.entity;
+            ThrowIfSizeIsTooGreat<T>();
+            void* shapePointer = Unsafe.AsPointer(ref shape);
+            return new Shape(shape.TypeIndex, (float*)shapePointer, offset);
+        }
+
+        [Conditional("DEBUG")]
+        private static void ThrowIfSizeIsTooGreat<T>()
+        {
+            int maxSize = sizeof(float) * 5;
+            int size = Unsafe.SizeOf<T>();
+            if (size > maxSize)
+            {
+                throw new ArgumentException($"The size of {typeof(T).Name} is too great. The maximum amount of floats that can be stored is 5.");
+            }
         }
     }
 }
