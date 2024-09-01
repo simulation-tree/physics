@@ -24,7 +24,7 @@ namespace Physics
         {
             get
             {
-                return entity.GetArrayElement<CollisionContact>(index);
+                return entity.GetArrayElementRef<CollisionContact>(index);
             }
         }
 
