@@ -1,33 +1,31 @@
 ﻿using Physics.Events;
 using Simulation;
 using System;
+using Unmanaged;
 
 namespace Physics.Functions
 {
     public unsafe readonly struct RaycastHitCallback : IEquatable<RaycastHitCallback>
     {
 #if NET
-        private readonly delegate* unmanaged<World, Raycast, RaycastHit*, int, void> callback;
+        private readonly delegate* unmanaged<World, Raycast, RaycastHit*, uint, void> callback;
 
-        public RaycastHitCallback(delegate* unmanaged<World, Raycast, RaycastHit*, int, void> callback)
+        public RaycastHitCallback(delegate* unmanaged<World, Raycast, RaycastHit*, uint, void> callback)
         {
             this.callback = callback;
         }
 #else
-        private readonly delegate*<World, Raycast, RaycastHit*, int, void> callback;
+        private readonly delegate*<World, Raycast, RaycastHit*, uint, void> callback;
 
-        public RaycastHitCallback(delegate*<World, Raycast, RaycastHit*, int, void> callback)
+        public RaycastHitCallback(delegate*<World, Raycast, RaycastHit*, uint, void> callback)
         {
             this.callback = callback;
         }
 #endif
 
-        public readonly void Invoke(World world, Raycast raycast, Span<RaycastHit> hits)
+        public readonly void Invoke(World world, Raycast raycast, USpan<RaycastHit> hits)
         {
-            fixed (RaycastHit* hitsPtr = hits)
-            {
-                callback(world, raycast, hitsPtr, hits.Length);
-            }
+            callback(world, raycast, hits.pointer, hits.length);
         }
 
         public readonly override bool Equals(object? obj)

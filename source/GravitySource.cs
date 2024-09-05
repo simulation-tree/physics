@@ -8,14 +8,15 @@ namespace Physics
 {
     public readonly struct GravitySource : IEntity
     {
-        private readonly Entity entity;
+        public readonly Transform transform;
 
-        public readonly bool IsDirectional => entity.ContainsComponent<IsDirectionalGravity>();
-        public readonly bool IsPoint => entity.ContainsComponent<IsPointGravity>();
-        public readonly ref float Force => ref entity.GetComponentRef<IsGravitySource>().force;
+        public readonly bool IsDirectional => transform.entity.ContainsComponent<IsDirectionalGravity>();
+        public readonly bool IsPoint => transform.entity.ContainsComponent<IsPointGravity>();
+        public readonly ref float Force => ref transform.entity.GetComponentRef<IsGravitySource>().force;
 
-        uint IEntity.Value => entity;
-        World IEntity.World => entity;
+        readonly uint IEntity.Value => transform.entity.value;
+        readonly World IEntity.World => transform.entity.world;
+        readonly Definition IEntity.Definition => new([RuntimeType.Get<IsGravitySource>()], []);
 
 #if NET
         [Obsolete("Default constructor not available", true)]
@@ -25,24 +26,10 @@ namespace Physics
         }
 #endif
 
-        public GravitySource(World world, uint existingEntity)
+        public GravitySource(World world, float force = 9.8067f)
         {
-            entity = new(world, existingEntity);
-        }
-
-        Query IEntity.GetQuery(World world)
-        {
-            return new(world, RuntimeType.Get<IsGravitySource>());
-        }
-
-        public static implicit operator Entity(GravitySource gravity)
-        {
-            return gravity.entity;
-        }
-
-        public static implicit operator Transform(GravitySource gravity)
-        {
-            return gravity.entity.As<Transform>();
+            transform = new(world);
+            transform.entity.AddComponent(new IsGravitySource(force));
         }
     }
 }

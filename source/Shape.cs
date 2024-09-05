@@ -16,10 +16,11 @@ namespace Physics
         {
             this.type = type;
             this.offset = offset;
-            for (int i = 0; i < 5; i++)
-            {
-                this.data[i] = data[i];
-            }
+            this.data[0] = data[0];
+            this.data[1] = data[1];
+            this.data[2] = data[2];
+            this.data[3] = data[3];
+            this.data[4] = data[4];
         }
 
         public readonly bool Is<T>(out T shape) where T : unmanaged, IShape

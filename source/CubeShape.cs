@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 
 namespace Physics
 {
@@ -7,6 +8,14 @@ namespace Physics
         public readonly Vector3 extents;
 
         byte IShape.TypeIndex => 2;
+
+#if NET
+        [Obsolete("Default constructor not available", true)]
+        public CubeShape()
+        {
+            throw new NotSupportedException();
+        }
+#endif
 
         public CubeShape(Vector3 extents)
         {

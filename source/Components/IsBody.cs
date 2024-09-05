@@ -1,10 +1,20 @@
-﻿namespace Physics.Components
+﻿using System;
+
+namespace Physics.Components
 {
     public struct IsBody
     {
         public uint version;
         public Shape shape;
         public Type type;
+
+#if NET
+        [Obsolete("Default constructor not available", true)]
+        public IsBody()
+        {
+            throw new NotSupportedException();
+        }
+#endif
 
         public IsBody(Shape shape, Type type)
         {

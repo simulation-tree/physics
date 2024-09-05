@@ -1,5 +1,5 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
+using Unmanaged;
 
 namespace Physics
 {
@@ -18,16 +18,16 @@ namespace Physics
             this.entity = targetEntity;
         }
 
-        public readonly override string ToString()
+        public unsafe readonly override string ToString()
         {
-            Span<char> buffer = stackalloc char[96];
-            int length = ToString(buffer);
-            return new string(buffer[..length]);
+            USpan<char> buffer = stackalloc char[96];
+            uint length = ToString(buffer);
+            return new string(buffer.pointer, 0, (int)length);
         }
 
-        public readonly int ToString(Span<char> buffer)
+        public readonly uint ToString(USpan<char> buffer)
         {
-            int length = 0;
+            uint length = 0;
             buffer[length++] = 'R';
             buffer[length++] = 'a';
             buffer[length++] = 'y';
@@ -39,45 +39,21 @@ namespace Physics
             buffer[length++] = 'i';
             buffer[length++] = 't';
             buffer[length++] = '(';
-
-            point.X.TryFormat(buffer[length..], out int written);
-            length += written;
-
+            length += point.X.ToString(buffer.Slice(length));
             buffer[length++] = ',';
-
-            point.Y.TryFormat(buffer[length..], out written);
-            length += written;
-
+            length += point.Y.ToString(buffer.Slice(length));
             buffer[length++] = ',';
-
-            point.Z.TryFormat(buffer[length..], out written);
-            length += written;
-
+            length += point.Z.ToString(buffer.Slice(length));
             buffer[length++] = ',';
-
-            normal.X.TryFormat(buffer[length..], out written);
-            length += written;
-
+            length += normal.X.ToString(buffer.Slice(length));
             buffer[length++] = ',';
-
-            normal.Y.TryFormat(buffer[length..], out written);
-            length += written;
-
+            length += normal.Y.ToString(buffer.Slice(length));
             buffer[length++] = ',';
-
-            normal.Z.TryFormat(buffer[length..], out written);
-            length += written;
-
+            length += normal.Z.ToString(buffer.Slice(length));
             buffer[length++] = ',';
-
-            distance.TryFormat(buffer[length..], out written);
-            length += written;
-
+            length += distance.ToString(buffer.Slice(length));
             buffer[length++] = ',';
-
-            entity.TryFormat(buffer[length..], out written);
-            length += written;
-
+            length += entity.ToString(buffer.Slice(length));
             buffer[length++] = ')';
             return length;
         }

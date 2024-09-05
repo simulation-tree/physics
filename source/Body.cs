@@ -1,40 +1,65 @@
 ﻿using Physics.Components;
 using Simulation;
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using Transforms;
-using Transforms.Components;
 using Unmanaged;
 
 namespace Physics
 {
     public readonly struct Body : IEntity
     {
-        private readonly Entity entity;
+        public readonly Transform transform;
 
-        public readonly ref Vector3 LinearVelocity => ref entity.GetComponentRef<LinearVelocity>().value;
-        public readonly ref Vector3 AngularVelocity => ref entity.GetComponentRef<AngularVelocity>().value;
-        public readonly ref float GravityScale => ref entity.GetComponentRef<GravityScale>().value;
-        public readonly ref float Mass => ref entity.GetComponentRef<Mass>().value;
-        public readonly ref Shape Shape => ref entity.GetComponentRef<IsBody>().shape;
-
-        public readonly uint ContactCount => entity.GetArrayLength<CollisionContact>();
-
-        public readonly CollisionContact this[uint index]
+        public readonly ref Vector3 LinearVelocity
         {
             get
             {
-                return entity.GetArrayElementRef<CollisionContact>(index);
+                ThrowIfBodyIsStatic();
+                return ref transform.entity.GetComponentRef<LinearVelocity>().value;
             }
         }
 
-        public readonly ReadOnlySpan<CollisionContact> Contacts
+        public readonly ref Vector3 AngularVelocity
         {
             get
             {
-                if (entity.ContainsArray<CollisionContact>())
+                ThrowIfBodyIsStatic();
+                return ref transform.entity.GetComponentRef<AngularVelocity>().value;
+            }
+        }
+
+        public readonly ref float GravityScale
+        {
+            get
+            {
+                ThrowIfBodyIsStatic();
+                return ref transform.entity.GetComponentRef<GravityScale>().value;
+            }
+        }
+
+        public readonly ref float Mass
+        {
+            get
+            {
+                ThrowIfBodyIsStatic();
+                return ref transform.entity.GetComponentRef<Mass>().value;
+            }
+        }
+
+        public readonly ref Shape Shape => ref transform.entity.GetComponentRef<IsBody>().shape;
+
+        public readonly uint ContactCount => transform.entity.GetArrayLength<CollisionContact>();
+        public readonly CollisionContact this[uint index] => transform.entity.GetArrayElementRef<CollisionContact>(index);
+
+        public readonly USpan<CollisionContact> Contacts
+        {
+            get
+            {
+                if (transform.entity.ContainsArray<CollisionContact>())
                 {
-                    return entity.GetArray<CollisionContact>();
+                    return transform.entity.GetArray<CollisionContact>();
                 }
                 else
                 {
@@ -47,13 +72,14 @@ namespace Physics
         {
             get
             {
-                WorldBounds bounds = entity.GetComponentRef<WorldBounds>();
+                WorldBounds bounds = transform.entity.GetComponentRef<WorldBounds>();
                 return (bounds.min, bounds.max);
             }
         }
 
-        uint IEntity.Value => entity;
-        World IEntity.World => entity;
+        readonly uint IEntity.Value => transform.entity.value;
+        readonly World IEntity.World => transform.entity.world;
+        readonly Definition IEntity.Definition => new([RuntimeType.Get<IsBody>()], []);
 
 #if NET
         [Obsolete("Default constructor not available", true)]
@@ -68,33 +94,24 @@ namespace Physics
         /// </summary>
         public Body(World world, Shape shape, IsBody.Type type, Vector3 initialVelocity = default)
         {
-            entity = new(world);
-            entity.AddComponent(new IsBody(shape, type));
+            transform = new(world);
+            transform.entity.AddComponent(new IsBody(shape, type));
             if (type != IsBody.Type.Static)
             {
-                entity.AddComponent(new LinearVelocity(initialVelocity));
-                entity.AddComponent(new AngularVelocity());
-                entity.AddComponent(Components.GravityScale.Default);
-                entity.AddComponent(Components.Mass.Default);
+                transform.entity.AddComponent(new LinearVelocity(initialVelocity));
+                transform.entity.AddComponent(new AngularVelocity());
+                transform.entity.AddComponent(Components.GravityScale.Default);
+                transform.entity.AddComponent(Components.Mass.Default);
             }
-
-            entity.AddComponent(new Position());
-            entity.AddComponent(new IsTransform());
         }
 
-        Query IEntity.GetQuery(World world)
+        [Conditional("DEBUG")]
+        private readonly void ThrowIfBodyIsStatic()
         {
-            return new(world, RuntimeType.Get<IsBody>());
-        }
-
-        public static implicit operator Entity(Body collider)
-        {
-            return collider.entity;
-        }
-
-        public static implicit operator Transform(Body collider)
-        {
-            return collider.entity.As<Transform>();
+            if (transform.entity.GetComponent<IsBody>().type == IsBody.Type.Static)
+            {
+                throw new InvalidOperationException($"Body `{transform.entity}` is static");
+            }
         }
     }
 }

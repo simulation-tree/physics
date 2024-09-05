@@ -2,21 +2,20 @@
 using Simulation;
 using System;
 using System.Numerics;
-using Transforms;
-using Transforms.Components;
 using Unmanaged;
 
 namespace Physics
 {
     public readonly struct PointGravity : IEntity
     {
-        private readonly GravitySource gravity;
+        public readonly GravitySource gravity;
 
-        public readonly ref float Force => ref ((Entity)gravity).GetComponentRef<IsGravitySource>().force;
-        public readonly ref float Radius => ref ((Entity)gravity).GetComponentRef<IsPointGravity>().radius;
+        public readonly ref float Force => ref gravity.Force;
+        public readonly ref float Radius => ref gravity.transform.entity.GetComponentRef<IsPointGravity>().radius;
 
-        uint IEntity.Value => (Entity)gravity;
-        World IEntity.World => (Entity)gravity;
+        readonly uint IEntity.Value => gravity.transform.entity.value;
+        readonly World IEntity.World => gravity.transform.entity.world;
+        readonly Definition IEntity.Definition => new([RuntimeType.Get<IsPointGravity>(), RuntimeType.Get<IsGravitySource>()], []);
 
 #if NET
         [Obsolete("Default constructor not available", true)]
@@ -28,32 +27,9 @@ namespace Physics
 
         public PointGravity(World world, Vector3 position, float radius, float force = 9.8067f)
         {
-            Entity entity = new(world);
-            entity.AddComponent(new IsGravitySource(force));
-            entity.AddComponent(new IsPointGravity(radius));
-            entity.AddComponent(new IsTransform());
-            entity.AddComponent(new Position(position));
-            gravity = entity.As<GravitySource>();
-        }
-
-        readonly Query IEntity.GetQuery(World world)
-        {
-            return new(world, RuntimeType.Get<IsPointGravity>());
-        }
-
-        public static implicit operator GravitySource(PointGravity gravity)
-        {
-            return gravity.gravity;
-        }
-
-        public static implicit operator Entity(PointGravity gravity)
-        {
-            return gravity.gravity;
-        }
-
-        public static implicit operator Transform(PointGravity gravity)
-        {
-            return gravity.gravity;
+            gravity = new(world, force);
+            gravity.transform.entity.AddComponent(new IsPointGravity(radius));
+            gravity.transform.LocalPosition = position;
         }
     }
 }
