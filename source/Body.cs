@@ -113,5 +113,15 @@ namespace Physics
                 throw new InvalidOperationException($"Body `{transform.entity}` is static");
             }
         }
+
+        public static implicit operator Transform(Body body)
+        {
+            return body.transform;
+        }
+
+        public static implicit operator Entity(Body body)
+        {
+            return body.transform.entity;
+        }
     }
 }
