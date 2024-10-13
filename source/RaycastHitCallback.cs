@@ -25,7 +25,7 @@ namespace Physics.Functions
 
         public readonly void Invoke(World world, Raycast raycast, USpan<RaycastHit> hits)
         {
-            callback(world, raycast, hits.pointer, hits.Length);
+            callback(world, raycast, (RaycastHit*)hits.Address, hits.Length);
         }
 
         public readonly override bool Equals(object? obj)
