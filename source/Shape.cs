@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace Physics
 {
@@ -29,7 +28,7 @@ namespace Physics
             {
                 fixed (float* data = this.data)
                 {
-                    shape = Unsafe.Read<T>(data);
+                    shape = *(T*)data;
                     return true;
                 }
             }
@@ -40,21 +39,44 @@ namespace Physics
             }
         }
 
+        public readonly bool Is<T>() where T : unmanaged, IShape
+        {
+            return type == default(T).TypeIndex;
+        }
+
+        public readonly T Read<T>() where T : unmanaged, IShape
+        {
+            ThrowIfTypeIsNot<T>();
+            fixed (float* data = this.data)
+            {
+                return *(T*)data;
+            }
+        }
+
         public static Shape Create<T>(T shape, Vector3 offset = default) where T : unmanaged, IShape
         {
             ThrowIfSizeIsTooGreat<T>();
-            void* shapePointer = Unsafe.AsPointer(ref shape);
+            void* shapePointer = &shape;
             return new Shape(shape.TypeIndex, (float*)shapePointer, offset);
         }
 
         [Conditional("DEBUG")]
-        private static void ThrowIfSizeIsTooGreat<T>()
+        private readonly void ThrowIfTypeIsNot<T>() where T : unmanaged, IShape
+        {
+            if (type != default(T).TypeIndex)
+            {
+                throw new InvalidOperationException($"The shape is not of type {typeof(T).Name}");
+            }
+        }
+
+        [Conditional("DEBUG")]
+        private static void ThrowIfSizeIsTooGreat<T>() where T : unmanaged
         {
             int maxSize = sizeof(float) * 5;
-            int size = Unsafe.SizeOf<T>();
+            int size = sizeof(T);
             if (size > maxSize)
             {
-                throw new ArgumentException($"The size of {typeof(T).Name} is too great. The maximum amount of floats that can be stored is 5.");
+                throw new ArgumentException($"The size of {typeof(T).Name} is too great. The maximum amount of floats that can be stored is 5");
             }
         }
     }

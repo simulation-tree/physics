@@ -49,7 +49,6 @@ namespace Physics
         }
 
         public readonly ref Shape Shape => ref transform.entity.GetComponentRef<IsBody>().shape;
-
         public readonly uint ContactCount => transform.entity.GetArrayLength<CollisionContact>();
         public readonly CollisionContact this[uint index] => transform.entity.GetArrayElementRef<CollisionContact>(index);
 
@@ -77,9 +76,9 @@ namespace Physics
             }
         }
 
-        readonly uint IEntity.Value => transform.entity.value;
-        readonly World IEntity.World => transform.entity.world;
-        readonly Definition IEntity.Definition => new([RuntimeType.Get<IsBody>()], []);
+        readonly uint IEntity.Value => transform.GetEntityValue();
+        readonly World IEntity.World => transform.GetWorld();
+        readonly Definition IEntity.Definition => new Definition().AddComponentType<IsBody>();
 
 #if NET
         [Obsolete("Default constructor not available", true)]
@@ -95,14 +94,19 @@ namespace Physics
         public Body(World world, Shape shape, IsBody.Type type, Vector3 initialVelocity = default)
         {
             transform = new(world);
-            transform.entity.AddComponent(new IsBody(shape, type));
+            transform.AddComponent(new IsBody(shape, type));
             if (type != IsBody.Type.Static)
             {
-                transform.entity.AddComponent(new LinearVelocity(initialVelocity));
-                transform.entity.AddComponent(new AngularVelocity());
-                transform.entity.AddComponent(Components.GravityScale.Default);
-                transform.entity.AddComponent(Components.Mass.Default);
+                transform.AddComponent(new LinearVelocity(initialVelocity));
+                transform.AddComponent(new AngularVelocity());
+                transform.AddComponent(Components.GravityScale.Default);
+                transform.AddComponent(Components.Mass.Default);
             }
+        }
+
+        public readonly void Dispose()
+        {
+            transform.Dispose();
         }
 
         [Conditional("DEBUG")]
@@ -110,7 +114,7 @@ namespace Physics
         {
             if (transform.entity.GetComponent<IsBody>().type == IsBody.Type.Static)
             {
-                throw new InvalidOperationException($"Body `{transform.entity}` is static");
+                throw new InvalidOperationException($"Body `{transform}` is static");
             }
         }
 

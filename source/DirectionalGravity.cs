@@ -2,6 +2,7 @@
 using Simulation;
 using System;
 using System.Numerics;
+using Transforms;
 using Transforms.Components;
 using Unmanaged;
 
@@ -12,10 +13,18 @@ namespace Physics
         public readonly GravitySource gravity;
 
         public readonly ref float Force => ref gravity.Force;
+        public readonly Vector3 Direction
+        {
+            get
+            {
+                Transform transform = gravity;
+                return Vector3.Transform(Vector3.UnitZ, transform.WorldRotation);
+            }
+        }
 
-        readonly uint IEntity.Value => gravity.transform.entity.value;
-        readonly World IEntity.World => gravity.transform.entity.world;
-        readonly Definition IEntity.Definition => new([RuntimeType.Get<IsDirectionalGravity>(), RuntimeType.Get<IsGravitySource>()], []);
+        readonly uint IEntity.Value => gravity.GetEntityValue();
+        readonly World IEntity.World => gravity.GetWorld();
+        readonly Definition IEntity.Definition => new Definition().AddComponentTypes<IsDirectionalGravity, IsGravitySource>();
 
 #if NET
         [Obsolete("Default constructor not available", true)]
@@ -27,16 +36,46 @@ namespace Physics
 
         public DirectionalGravity(World world, Quaternion rotation, float force = 9.8067f)
         {
-            gravity = new(world, force);
-            gravity.transform.entity.AddComponent(new IsDirectionalGravity());
-            gravity.transform.LocalRotation = rotation;
+            gravity = new(world, Position.Default.value, rotation, force);
+            gravity.AddComponent(new IsDirectionalGravity());
         }
 
         public DirectionalGravity(World world, Vector3 direction, float force = 9.8067f)
         {
-            gravity = new(world, force);
-            gravity.transform.entity.AddComponent(new IsDirectionalGravity());
-            gravity.transform.LocalRotation = Rotation.FromDirection(direction).value;
+            gravity = new(world, Position.Default.value, Rotation.FromDirection(direction).value, force);
+            gravity.AddComponent(new IsDirectionalGravity());
+        }
+
+        public readonly void Dispose()
+        {
+            gravity.Dispose();
+        }
+
+        public readonly override string ToString()
+        {
+            USpan<char> buffer = stackalloc char[64];
+            uint length = ToString(buffer);
+            return buffer.Slice(0, length).ToString();
+        }
+
+        public readonly uint ToString(USpan<char> buffer)
+        {
+            return gravity.ToString(buffer);
+        }
+
+        public static implicit operator GravitySource(DirectionalGravity gravity)
+        {
+            return gravity.gravity;
+        }
+
+        public static implicit operator Entity(DirectionalGravity gravity)
+        {
+            return gravity.gravity.transform;
+        }
+
+        public static implicit operator Transform(DirectionalGravity gravity)
+        {
+            return gravity.gravity.transform;
         }
     }
 }
