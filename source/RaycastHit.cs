@@ -10,12 +10,12 @@ namespace Physics
         public float distance;
         public uint entity;
 
-        public RaycastHit(Vector3 point, Vector3 normal, float distance, uint targetEntity)
+        public RaycastHit(Vector3 point, Vector3 normal, float distance, uint entity)
         {
             this.point = point;
             this.normal = normal;
             this.distance = distance;
-            this.entity = targetEntity;
+            this.entity = entity;
         }
 
         public unsafe readonly override string ToString()
