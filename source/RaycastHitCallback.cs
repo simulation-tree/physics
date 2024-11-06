@@ -8,9 +8,9 @@ namespace Physics.Functions
     public unsafe readonly struct RaycastHitCallback : IEquatable<RaycastHitCallback>
     {
 #if NET
-        private readonly delegate* unmanaged<World, Raycast, RaycastHit*, uint, void> callback;
+        private readonly delegate* unmanaged<World, RaycastRequest, RaycastHit*, uint, void> callback;
 
-        public RaycastHitCallback(delegate* unmanaged<World, Raycast, RaycastHit*, uint, void> callback)
+        public RaycastHitCallback(delegate* unmanaged<World, RaycastRequest, RaycastHit*, uint, void> callback)
         {
             this.callback = callback;
         }
@@ -23,7 +23,7 @@ namespace Physics.Functions
         }
 #endif
 
-        public readonly void Invoke(World world, Raycast raycast, USpan<RaycastHit> hits)
+        public readonly void Invoke(World world, RaycastRequest raycast, USpan<RaycastHit> hits)
         {
             callback(world, raycast, (RaycastHit*)hits.Address, hits.Length);
         }

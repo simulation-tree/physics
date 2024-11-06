@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace Physics.Events
 {
-    public readonly struct Raycast
+    public readonly struct RaycastRequest
     {
         public readonly Vector3 origin;
         public readonly Vector3 direction;
@@ -14,13 +14,13 @@ namespace Physics.Events
 
 #if NET
         [Obsolete("Default constructor not available", true)]
-        public Raycast()
+        public RaycastRequest()
         {
             throw new NotSupportedException();
         }
 #endif
 
-        public Raycast(Vector3 origin, Vector3 direction, RaycastHitCallback callback, float distance = 1000f, ulong identifier = default)
+        public RaycastRequest(Vector3 origin, Vector3 direction, RaycastHitCallback callback, float distance = 1000f, ulong identifier = default)
         {
             this.origin = origin;
             this.direction = direction;
