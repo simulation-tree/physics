@@ -1,4 +1,5 @@
 ﻿using Physics.Functions;
+using Simulation;
 using System;
 using System.Numerics;
 
@@ -6,6 +7,7 @@ namespace Physics.Events
 {
     public readonly struct RaycastRequest
     {
+        public readonly World world;
         public readonly Vector3 origin;
         public readonly Vector3 direction;
         public readonly RaycastHitCallback callback;
@@ -20,8 +22,9 @@ namespace Physics.Events
         }
 #endif
 
-        public RaycastRequest(Vector3 origin, Vector3 direction, RaycastHitCallback callback, float distance = 1000f, ulong identifier = default)
+        public RaycastRequest(World world, Vector3 origin, Vector3 direction, RaycastHitCallback callback, float distance = 1000f, ulong identifier = default)
         {
+            this.world = world;
             this.origin = origin;
             this.direction = direction;
             this.callback = callback;
