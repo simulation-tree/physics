@@ -1,23 +1,23 @@
 ﻿using Physics.Components;
-using Simulation;
 using System;
 using System.Diagnostics;
 using System.Numerics;
 using Transforms;
 using Unmanaged;
+using Worlds;
 
 namespace Physics
 {
     public readonly struct Body : IEntity
     {
-        public readonly Transform transform;
+        private readonly Transform transform;
 
         public readonly ref Vector3 LinearVelocity
         {
             get
             {
                 ThrowIfBodyIsStatic();
-                return ref transform.entity.GetComponentRef<LinearVelocity>().value;
+                return ref transform.AsEntity().GetComponentRef<LinearVelocity>().value;
             }
         }
 
@@ -26,7 +26,7 @@ namespace Physics
             get
             {
                 ThrowIfBodyIsStatic();
-                return ref transform.entity.GetComponentRef<AngularVelocity>().value;
+                return ref transform.AsEntity().GetComponentRef<AngularVelocity>().value;
             }
         }
 
@@ -35,7 +35,7 @@ namespace Physics
             get
             {
                 ThrowIfBodyIsStatic();
-                return ref transform.entity.GetComponentRef<GravityScale>().value;
+                return ref transform.AsEntity().GetComponentRef<GravityScale>().value;
             }
         }
 
@@ -44,21 +44,21 @@ namespace Physics
             get
             {
                 ThrowIfBodyIsStatic();
-                return ref transform.entity.GetComponentRef<Mass>().value;
+                return ref transform.AsEntity().GetComponentRef<Mass>().value;
             }
         }
 
-        public readonly ref Shape Shape => ref transform.entity.GetComponentRef<IsBody>().shape;
-        public readonly uint ContactCount => transform.entity.GetArrayLength<CollisionContact>();
-        public readonly CollisionContact this[uint index] => transform.entity.GetArrayElementRef<CollisionContact>(index);
+        public readonly ref Shape Shape => ref transform.AsEntity().GetComponentRef<IsBody>().shape;
+        public readonly uint ContactCount => transform.AsEntity().GetArrayLength<CollisionContact>();
+        public readonly CollisionContact this[uint index] => transform.AsEntity().GetArrayElementRef<CollisionContact>(index);
 
         public readonly USpan<CollisionContact> Contacts
         {
             get
             {
-                if (transform.entity.ContainsArray<CollisionContact>())
+                if (transform.AsEntity().TryGetArray(out USpan<CollisionContact> contacts))
                 {
-                    return transform.entity.GetArray<CollisionContact>();
+                    return contacts;
                 }
                 else
                 {
@@ -71,7 +71,7 @@ namespace Physics
         {
             get
             {
-                WorldBounds bounds = transform.entity.GetComponentRef<WorldBounds>();
+                WorldBounds bounds = transform.AsEntity().GetComponentRef<WorldBounds>();
                 return (bounds.min, bounds.max);
             }
         }
@@ -112,7 +112,7 @@ namespace Physics
         [Conditional("DEBUG")]
         private readonly void ThrowIfBodyIsStatic()
         {
-            if (transform.entity.GetComponent<IsBody>().type == IsBody.Type.Static)
+            if (transform.AsEntity().GetComponent<IsBody>().type == IsBody.Type.Static)
             {
                 throw new InvalidOperationException($"Body `{transform}` is static");
             }
@@ -125,7 +125,7 @@ namespace Physics
 
         public static implicit operator Entity(Body body)
         {
-            return body.transform.entity;
+            return body.transform;
         }
     }
 }

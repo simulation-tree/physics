@@ -1,10 +1,10 @@
 ﻿using Physics.Components;
-using Simulation;
 using System;
 using System.Numerics;
 using Transforms;
 using Transforms.Components;
 using Unmanaged;
+using Worlds;
 
 namespace Physics
 {
@@ -70,12 +70,12 @@ namespace Physics
 
         public static implicit operator Entity(DirectionalGravity gravity)
         {
-            return gravity.gravity.transform;
+            return gravity.gravity;
         }
 
         public static implicit operator Transform(DirectionalGravity gravity)
         {
-            return gravity.gravity.transform;
+            return gravity.gravity;
         }
     }
 }

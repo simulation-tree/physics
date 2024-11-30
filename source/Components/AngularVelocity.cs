@@ -4,11 +4,11 @@ using Worlds;
 namespace Physics.Components
 {
     [Component]
-    public struct LinearVelocity
+    public struct AngularVelocity
     {
         public Vector3 value;
 
-        public LinearVelocity(Vector3 value)
+        public AngularVelocity(Vector3 value)
         {
             this.value = value;
         }

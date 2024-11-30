@@ -1,23 +1,23 @@
 ﻿using Physics.Components;
-using Simulation;
 using System;
 using System.Numerics;
 using Transforms;
 using Transforms.Components;
 using Unmanaged;
+using Worlds;
 
 namespace Physics
 {
     public readonly struct GravitySource : IEntity
     {
-        public readonly Transform transform;
+        private readonly Transform transform;
 
-        public readonly bool IsDirectional => transform.entity.ContainsComponent<IsDirectionalGravity>();
-        public readonly bool IsPoint => transform.entity.ContainsComponent<IsPointGravity>();
-        public readonly ref float Force => ref transform.entity.GetComponentRef<IsGravitySource>().force;
+        public readonly bool IsDirectional => transform.AsEntity().ContainsComponent<IsDirectionalGravity>();
+        public readonly bool IsPoint => transform.AsEntity().ContainsComponent<IsPointGravity>();
+        public readonly ref float Force => ref transform.AsEntity().GetComponentRef<IsGravitySource>().force;
 
-        readonly uint IEntity.Value => transform.entity.value;
-        readonly World IEntity.World => transform.entity.world;
+        readonly uint IEntity.Value => transform.GetEntityValue();
+        readonly World IEntity.World => transform.GetWorld();
         readonly Definition IEntity.Definition => new Definition().AddComponentType<IsGravitySource>();
 
 #if NET

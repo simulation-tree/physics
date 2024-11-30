@@ -1,10 +1,10 @@
 ﻿using Physics.Components;
-using Simulation;
 using System;
 using System.Numerics;
 using Transforms;
 using Transforms.Components;
 using Unmanaged;
+using Worlds;
 
 namespace Physics
 {
@@ -13,8 +13,8 @@ namespace Physics
         public readonly GravitySource gravity;
 
         public readonly ref float Force => ref gravity.Force;
-        public readonly ref float Radius => ref gravity.transform.entity.GetComponentRef<IsPointGravity>().radius;
-        public readonly Vector3 Position => gravity.transform.WorldPosition;
+        public readonly ref float Radius => ref gravity.AsEntity().GetComponentRef<IsPointGravity>().radius;
+        public readonly Vector3 Position => ((Transform)gravity).WorldPosition;
 
         readonly uint IEntity.Value => gravity.GetEntityValue();
         readonly World IEntity.World => gravity.GetWorld();
@@ -58,12 +58,12 @@ namespace Physics
 
         public static implicit operator Entity(PointGravity gravity)
         {
-            return gravity.gravity.transform;
+            return gravity.gravity;
         }
 
         public static implicit operator Transform(PointGravity gravity)
         {
-            return gravity.gravity.transform;
+            return gravity.gravity;
         }
     }
 }

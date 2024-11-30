@@ -1,8 +1,9 @@
-﻿using Simulation;
-using System.Numerics;
+﻿using System.Numerics;
+using Worlds;
 
 namespace Physics.Components
 {
+    [Array]
     public struct CollisionContact
     {
         public Vector3 point;

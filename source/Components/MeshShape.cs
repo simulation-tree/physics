@@ -1,7 +1,8 @@
-﻿using Simulation;
+﻿using Worlds;
 
 namespace Physics.Components
 {
+    [Component]
     public struct MeshShape
     {
         public rint meshReference;

@@ -1,7 +1,9 @@
 ﻿using System;
+using Worlds;
 
 namespace Physics.Components
 {
+    [Component]
     public struct IsBody
     {
         public uint version;

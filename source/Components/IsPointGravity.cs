@@ -1,7 +1,9 @@
 ﻿using System;
+using Worlds;
 
 namespace Physics.Components
 {
+    [Component]
     public struct IsPointGravity
     {
         public float radius;

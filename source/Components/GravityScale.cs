@@ -1,5 +1,8 @@
-﻿namespace Physics.Components
+﻿using Worlds;
+
+namespace Physics.Components
 {
+    [Component]
     public struct GravityScale
     {
         public static readonly GravityScale Default = new(1f);
