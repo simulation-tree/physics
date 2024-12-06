@@ -14,7 +14,7 @@ namespace Physics
 
         public readonly bool IsDirectional => transform.AsEntity().ContainsComponent<IsDirectionalGravity>();
         public readonly bool IsPoint => transform.AsEntity().ContainsComponent<IsPointGravity>();
-        public readonly ref float Force => ref transform.AsEntity().GetComponentRef<IsGravitySource>().force;
+        public readonly ref float Force => ref transform.AsEntity().GetComponent<IsGravitySource>().force;
 
         readonly uint IEntity.Value => transform.GetEntityValue();
         readonly World IEntity.World => transform.GetWorld();

@@ -13,7 +13,7 @@ namespace Physics
         public readonly GravitySource gravity;
 
         public readonly ref float Force => ref gravity.Force;
-        public readonly ref float Radius => ref gravity.AsEntity().GetComponentRef<IsPointGravity>().radius;
+        public readonly ref float Radius => ref gravity.AsEntity().GetComponent<IsPointGravity>().radius;
         public readonly Vector3 Position => ((Transform)gravity).WorldPosition;
 
         readonly uint IEntity.Value => gravity.GetEntityValue();

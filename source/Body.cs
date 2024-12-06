@@ -17,7 +17,7 @@ namespace Physics
             get
             {
                 ThrowIfBodyIsStatic();
-                return ref transform.AsEntity().GetComponentRef<LinearVelocity>().value;
+                return ref transform.AsEntity().GetComponent<LinearVelocity>().value;
             }
         }
 
@@ -26,7 +26,7 @@ namespace Physics
             get
             {
                 ThrowIfBodyIsStatic();
-                return ref transform.AsEntity().GetComponentRef<AngularVelocity>().value;
+                return ref transform.AsEntity().GetComponent<AngularVelocity>().value;
             }
         }
 
@@ -35,7 +35,7 @@ namespace Physics
             get
             {
                 ThrowIfBodyIsStatic();
-                return ref transform.AsEntity().GetComponentRef<GravityScale>().value;
+                return ref transform.AsEntity().GetComponent<GravityScale>().value;
             }
         }
 
@@ -44,13 +44,13 @@ namespace Physics
             get
             {
                 ThrowIfBodyIsStatic();
-                return ref transform.AsEntity().GetComponentRef<Mass>().value;
+                return ref transform.AsEntity().GetComponent<Mass>().value;
             }
         }
 
-        public readonly ref Shape Shape => ref transform.AsEntity().GetComponentRef<IsBody>().shape;
+        public readonly ref Shape Shape => ref transform.AsEntity().GetComponent<IsBody>().shape;
         public readonly uint ContactCount => transform.AsEntity().GetArrayLength<CollisionContact>();
-        public readonly CollisionContact this[uint index] => transform.AsEntity().GetArrayElementRef<CollisionContact>(index);
+        public readonly CollisionContact this[uint index] => transform.AsEntity().GetArrayElement<CollisionContact>(index);
 
         public readonly USpan<CollisionContact> Contacts
         {
@@ -71,7 +71,7 @@ namespace Physics
         {
             get
             {
-                WorldBounds bounds = transform.AsEntity().GetComponentRef<WorldBounds>();
+                WorldBounds bounds = transform.AsEntity().GetComponent<WorldBounds>();
                 return (bounds.min, bounds.max);
             }
         }
