@@ -78,7 +78,11 @@ namespace Physics
 
         readonly uint IEntity.Value => transform.GetEntityValue();
         readonly World IEntity.World => transform.GetWorld();
-        readonly Definition IEntity.Definition => new Definition().AddComponentType<IsBody>();
+
+        readonly Definition IEntity.GetDefinition(Schema schema)
+        {
+            return new Definition().AddComponentType<IsBody>(schema);
+        }
 
 #if NET
         [Obsolete("Default constructor not available", true)]
