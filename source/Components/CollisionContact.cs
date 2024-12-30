@@ -3,7 +3,7 @@ using Worlds;
 
 namespace Physics.Components
 {
-    [Array]
+    [ArrayElement]
     public struct CollisionContact
     {
         public Vector3 point;
