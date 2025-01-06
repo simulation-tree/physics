@@ -19,9 +19,10 @@ namespace Physics
         readonly uint IEntity.Value => gravity.GetEntityValue();
         readonly World IEntity.World => gravity.GetWorld();
 
-        readonly Definition IEntity.GetDefinition(Schema schema)
+        readonly void IEntity.Describe(ref Archetype archetype)
         {
-            return new Definition().AddComponentTypes<IsPointGravity, IsGravitySource>(schema);
+            archetype.AddComponentType<IsPointGravity>();
+            archetype.Add<GravitySource>();
         }
 
 #if NET

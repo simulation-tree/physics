@@ -79,9 +79,9 @@ namespace Physics
         readonly uint IEntity.Value => transform.GetEntityValue();
         readonly World IEntity.World => transform.GetWorld();
 
-        readonly Definition IEntity.GetDefinition(Schema schema)
+        readonly void IEntity.Describe(ref Archetype archetype)
         {
-            return new Definition().AddComponentType<IsBody>(schema);
+            archetype.AddComponentType<IsBody>();
         }
 
 #if NET
