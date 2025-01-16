@@ -12,7 +12,7 @@ namespace Physics.Events
         public readonly Vector3 direction;
         public readonly RaycastHitCallback callback;
         public readonly float distance;
-        public readonly ulong identifier;
+        public readonly ulong userData;
 
 #if NET
         [Obsolete("Default constructor not available", true)]
@@ -22,14 +22,14 @@ namespace Physics.Events
         }
 #endif
 
-        public RaycastRequest(World world, Vector3 origin, Vector3 direction, RaycastHitCallback callback, float distance = 1000f, ulong identifier = default)
+        public RaycastRequest(World world, Vector3 origin, Vector3 direction, RaycastHitCallback callback, float distance = 1000f, ulong userData = default)
         {
             this.world = world;
             this.origin = origin;
             this.direction = direction;
             this.callback = callback;
             this.distance = distance;
-            this.identifier = identifier;
+            this.userData = userData;
         }
     }
 }
