@@ -56,7 +56,8 @@ namespace Physics
             if (IsDirectional)
             {
                 Quaternion rotation = transform.WorldRotation;
-                length += "Directional Gravity(".AsUSpan().CopyTo(buffer);
+                USpan<char> template = "Directional Gravity(".AsSpan();
+                length += template.CopyTo(buffer);
                 Vector3 direction = Vector3.Transform(Vector3.UnitZ, rotation);
                 length += direction.ToString(buffer.Slice(length));
                 buffer[length++] = ',';
@@ -67,7 +68,8 @@ namespace Physics
             else
             {
                 Vector3 position = transform.WorldPosition;
-                length += "Point Gravity(".AsUSpan().CopyTo(buffer);
+                USpan<char> template = "Point Gravity(".AsSpan();
+                length += template.CopyTo(buffer);
                 length += position.ToString(buffer.Slice(length));
                 buffer[length++] = ',';
                 buffer[length++] = ' ';
