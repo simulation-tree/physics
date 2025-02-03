@@ -8,39 +8,22 @@ using Worlds;
 
 namespace Physics
 {
-    public readonly struct GravitySource : IEntity
+    public readonly partial struct GravitySource : IEntity
     {
-        private readonly Transform transform;
+        public readonly bool IsDirectional => ContainsComponent<IsDirectionalGravity>();
+        public readonly bool IsPoint => ContainsComponent<IsPointGravity>();
+        public readonly ref float Force => ref GetComponent<IsGravitySource>().force;
 
-        public readonly bool IsDirectional => transform.AsEntity().ContainsComponent<IsDirectionalGravity>();
-        public readonly bool IsPoint => transform.AsEntity().ContainsComponent<IsPointGravity>();
-        public readonly ref float Force => ref transform.AsEntity().GetComponent<IsGravitySource>().force;
-
-        readonly uint IEntity.Value => transform.GetEntityValue();
-        readonly World IEntity.World => transform.GetWorld();
+        public GravitySource(World world, Vector3 position, Quaternion rotation, float force = 9.8067f)
+        {
+            this.world = world;
+            value = new Transform(world, position, rotation, Scale.Default.value).value;
+            AddComponent(new IsGravitySource(force));
+        }
 
         readonly void IEntity.Describe(ref Archetype archetype)
         {
             archetype.AddComponentType<IsGravitySource>();
-        }
-
-#if NET
-        [Obsolete("Default constructor not available", true)]
-        public GravitySource()
-        {
-            throw new NotSupportedException();
-        }
-#endif
-
-        public GravitySource(World world, Vector3 position, Quaternion rotation, float force = 9.8067f)
-        {
-            transform = new(world, position, rotation, Scale.Default.value);
-            transform.AddComponent(new IsGravitySource(force));
-        }
-
-        public readonly void Dispose()
-        {
-            transform.Dispose();
         }
 
         public readonly override string ToString()
@@ -55,7 +38,7 @@ namespace Physics
             uint length = 0;
             if (IsDirectional)
             {
-                Quaternion rotation = transform.WorldRotation;
+                Quaternion rotation = As<Transform>().WorldRotation;
                 USpan<char> template = "Directional Gravity(".AsSpan();
                 length += template.CopyTo(buffer);
                 Vector3 direction = Vector3.Transform(Vector3.UnitZ, rotation);
@@ -67,7 +50,7 @@ namespace Physics
             }
             else
             {
-                Vector3 position = transform.WorldPosition;
+                Vector3 position = As<Transform>().WorldPosition;
                 USpan<char> template = "Point Gravity(".AsSpan();
                 length += template.CopyTo(buffer);
                 length += position.ToString(buffer.Slice(length));
@@ -80,14 +63,9 @@ namespace Physics
             return length;
         }
 
-        public static implicit operator Entity(GravitySource gravity)
-        {
-            return gravity.transform;
-        }
-
         public static implicit operator Transform(GravitySource gravity)
         {
-            return gravity.transform;
+            return gravity.As<Transform>();
         }
     }
 }

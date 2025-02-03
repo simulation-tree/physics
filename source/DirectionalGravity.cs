@@ -1,5 +1,4 @@
 ﻿using Physics.Components;
-using System;
 using System.Numerics;
 using Transforms;
 using Transforms.Components;
@@ -8,52 +7,37 @@ using Worlds;
 
 namespace Physics
 {
-    public readonly struct DirectionalGravity : IEntity
+    public readonly partial struct DirectionalGravity : IEntity
     {
-        public readonly GravitySource gravity;
+        public readonly ref float Force => ref As<GravitySource>().Force;
 
-        public readonly ref float Force => ref gravity.Force;
         public readonly Vector3 Direction
         {
             get
             {
-                Transform transform = gravity;
+                Transform transform = As<Transform>();
                 return Vector3.Transform(Vector3.UnitZ, transform.WorldRotation);
             }
         }
 
-        readonly uint IEntity.Value => gravity.GetEntityValue();
-        readonly World IEntity.World => gravity.GetWorld();
+        public DirectionalGravity(World world, Quaternion rotation, float force = 9.8067f)
+        {
+            this.world = world;
+            value = new GravitySource(world, Position.Default.value, rotation, force).value;
+            AddComponent(new IsDirectionalGravity());
+        }
+
+        public DirectionalGravity(World world, Vector3 direction, float force = 9.8067f)
+        {
+            this.world = world;
+            value = new GravitySource(world, Position.Default.value, Rotation.FromDirection(direction).value, force).value;
+            AddComponent(new IsDirectionalGravity());
+        }
 
         readonly void IEntity.Describe(ref Archetype archetype)
         {
             archetype.AddComponentType<IsDirectionalGravity>();
             archetype.Add<GravitySource>();
-        }
-
-#if NET
-        [Obsolete("Default constructor not available", true)]
-        public DirectionalGravity()
-        {
-            throw new NotSupportedException();
-        }
-#endif
-
-        public DirectionalGravity(World world, Quaternion rotation, float force = 9.8067f)
-        {
-            gravity = new(world, Position.Default.value, rotation, force);
-            gravity.AddComponent(new IsDirectionalGravity());
-        }
-
-        public DirectionalGravity(World world, Vector3 direction, float force = 9.8067f)
-        {
-            gravity = new(world, Position.Default.value, Rotation.FromDirection(direction).value, force);
-            gravity.AddComponent(new IsDirectionalGravity());
-        }
-
-        public readonly void Dispose()
-        {
-            gravity.Dispose();
         }
 
         public readonly override string ToString()
@@ -65,22 +49,17 @@ namespace Physics
 
         public readonly uint ToString(USpan<char> buffer)
         {
-            return gravity.ToString(buffer);
+            return value.ToString(buffer);
         }
 
         public static implicit operator GravitySource(DirectionalGravity gravity)
         {
-            return gravity.gravity;
-        }
-
-        public static implicit operator Entity(DirectionalGravity gravity)
-        {
-            return gravity.gravity;
+            return gravity.As<GravitySource>();
         }
 
         public static implicit operator Transform(DirectionalGravity gravity)
         {
-            return gravity.gravity;
+            return gravity.As<Transform>();
         }
     }
 }

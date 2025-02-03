@@ -8,16 +8,15 @@ using Worlds;
 
 namespace Physics
 {
-    public readonly struct Body : IEntity
+    public readonly partial struct Body : IEntity
     {
-        private readonly Transform transform;
-
         public readonly ref Vector3 LinearVelocity
         {
             get
             {
-                ThrowIfBodyIsStatic();
-                return ref transform.AsEntity().GetComponent<LinearVelocity>().value;
+                ThrowIfStatic();
+
+                return ref GetComponent<LinearVelocity>().value;
             }
         }
 
@@ -25,8 +24,9 @@ namespace Physics
         {
             get
             {
-                ThrowIfBodyIsStatic();
-                return ref transform.AsEntity().GetComponent<AngularVelocity>().value;
+                ThrowIfStatic();
+
+                return ref GetComponent<AngularVelocity>().value;
             }
         }
 
@@ -34,8 +34,9 @@ namespace Physics
         {
             get
             {
-                ThrowIfBodyIsStatic();
-                return ref transform.AsEntity().GetComponent<GravityScale>().value;
+                ThrowIfStatic();
+
+                return ref GetComponent<GravityScale>().value;
             }
         }
 
@@ -43,20 +44,22 @@ namespace Physics
         {
             get
             {
-                ThrowIfBodyIsStatic();
-                return ref transform.AsEntity().GetComponent<Mass>().value;
+                ThrowIfStatic();
+
+                return ref GetComponent<Mass>().value;
             }
         }
 
-        public readonly ref Shape Shape => ref transform.AsEntity().GetComponent<IsBody>().shape;
-        public readonly uint ContactCount => transform.AsEntity().GetArrayLength<CollisionContact>();
-        public readonly CollisionContact this[uint index] => transform.AsEntity().GetArrayElement<CollisionContact>(index);
+        public readonly BodyType Type => GetComponent<IsBody>().type;
+        public readonly ref Shape Shape => ref GetComponent<IsBody>().shape;
+        public readonly uint ContactCount => GetArrayLength<CollisionContact>();
+        public readonly CollisionContact this[uint index] => GetArrayElement<CollisionContact>(index);
 
         public readonly USpan<CollisionContact> Contacts
         {
             get
             {
-                if (transform.AsEntity().TryGetArray(out USpan<CollisionContact> contacts))
+                if (TryGetArray(out USpan<CollisionContact> contacts))
                 {
                     return contacts;
                 }
@@ -71,65 +74,45 @@ namespace Physics
         {
             get
             {
-                WorldBounds bounds = transform.AsEntity().GetComponent<WorldBounds>();
+                WorldBounds bounds = GetComponent<WorldBounds>();
                 return (bounds.min, bounds.max);
             }
         }
 
-        readonly uint IEntity.Value => transform.GetEntityValue();
-        readonly World IEntity.World => transform.GetWorld();
+        /// <summary>
+        /// Creates a physics body with default mass and gravity scale.
+        /// </summary>
+        public Body(World world, Shape shape, BodyType type, Vector3 initialVelocity = default)
+        {
+            this.world = world;
+            value = new Transform(world).value;
+            AddComponent(new IsBody(shape, type));
+            if (type != BodyType.Static)
+            {
+                AddComponent(new LinearVelocity(initialVelocity));
+                AddComponent(new AngularVelocity());
+                AddComponent(Components.GravityScale.Default);
+                AddComponent(Components.Mass.Default);
+            }
+        }
 
         readonly void IEntity.Describe(ref Archetype archetype)
         {
             archetype.AddComponentType<IsBody>();
         }
 
-#if NET
-        [Obsolete("Default constructor not available", true)]
-        public Body()
-        {
-            throw new NotSupportedException();
-        }
-#endif
-
-        /// <summary>
-        /// Creates a physics body with default mass and gravity scale.
-        /// </summary>
-        public Body(World world, Shape shape, IsBody.Type type, Vector3 initialVelocity = default)
-        {
-            transform = new(world);
-            transform.AddComponent(new IsBody(shape, type));
-            if (type != IsBody.Type.Static)
-            {
-                transform.AddComponent(new LinearVelocity(initialVelocity));
-                transform.AddComponent(new AngularVelocity());
-                transform.AddComponent(Components.GravityScale.Default);
-                transform.AddComponent(Components.Mass.Default);
-            }
-        }
-
-        public readonly void Dispose()
-        {
-            transform.Dispose();
-        }
-
         [Conditional("DEBUG")]
-        private readonly void ThrowIfBodyIsStatic()
+        private readonly void ThrowIfStatic()
         {
-            if (transform.AsEntity().GetComponent<IsBody>().type == IsBody.Type.Static)
+            if (Type == BodyType.Static)
             {
-                throw new InvalidOperationException($"Body `{transform}` is static");
+                throw new InvalidOperationException($"Physics body `{value}` is static");
             }
         }
 
         public static implicit operator Transform(Body body)
         {
-            return body.transform;
-        }
-
-        public static implicit operator Entity(Body body)
-        {
-            return body.transform;
+            return body.As<Transform>();
         }
     }
 }

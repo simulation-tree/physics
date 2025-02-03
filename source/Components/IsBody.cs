@@ -8,7 +8,7 @@ namespace Physics.Components
     {
         public uint version;
         public Shape shape;
-        public Type type;
+        public BodyType type;
 
 #if NET
         [Obsolete("Default constructor not available", true)]
@@ -18,18 +18,11 @@ namespace Physics.Components
         }
 #endif
 
-        public IsBody(Shape shape, Type type)
+        public IsBody(Shape shape, BodyType type)
         {
             version = default;
             this.shape = shape;
             this.type = type;
-        }
-
-        public enum Type : byte
-        {
-            Dynamic,
-            Kinematic,
-            Static
         }
     }
 }
