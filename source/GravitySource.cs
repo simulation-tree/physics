@@ -10,7 +10,7 @@ namespace Physics
 {
     public readonly partial struct GravitySource : IEntity
     {
-        public readonly bool IsDirectional => ContainsComponent<IsDirectionalGravity>();
+        public readonly bool IsDirectional => ContainsTag<IsDirectionalGravity>();
         public readonly bool IsPoint => ContainsComponent<IsPointGravity>();
         public readonly ref float Force => ref GetComponent<IsGravitySource>().force;
 

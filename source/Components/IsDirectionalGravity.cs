@@ -2,7 +2,7 @@
 
 namespace Physics.Components
 {
-    [Component]
+    [Tag]
     public struct IsDirectionalGravity
     {
     }

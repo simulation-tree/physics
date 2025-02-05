@@ -24,19 +24,19 @@ namespace Physics
         {
             this.world = world;
             value = new GravitySource(world, Position.Default.value, rotation, force).value;
-            AddComponent(new IsDirectionalGravity());
+            AddTag<IsDirectionalGravity>();
         }
 
         public DirectionalGravity(World world, Vector3 direction, float force = 9.8067f)
         {
             this.world = world;
             value = new GravitySource(world, Position.Default.value, Rotation.FromDirection(direction).value, force).value;
-            AddComponent(new IsDirectionalGravity());
+            AddTag<IsDirectionalGravity>();
         }
 
         readonly void IEntity.Describe(ref Archetype archetype)
         {
-            archetype.AddComponentType<IsDirectionalGravity>();
+            archetype.AddTagType<IsDirectionalGravity>();
             archetype.Add<GravitySource>();
         }
 
