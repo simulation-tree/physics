@@ -1,8 +1,5 @@
-﻿using Worlds;
-
-namespace Physics.Components
+﻿namespace Physics.Components
 {
-    [Tag]
     public struct IsDirectionalGravity
     {
     }

@@ -1,9 +1,7 @@
 ﻿using System.Numerics;
-using Worlds;
 
 namespace Physics.Components
 {
-    [Component]
     public struct WorldBounds
     {
         public Vector3 min;

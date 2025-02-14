@@ -1,9 +1,7 @@
 ﻿using System.Numerics;
-using Worlds;
 
 namespace Physics.Components
 {
-    [ArrayElement]
     public struct CollisionContact
     {
         public Vector3 point;
