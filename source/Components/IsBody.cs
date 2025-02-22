@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Shapes;
+using System;
+using System.Numerics;
 
 namespace Physics.Components
 {
@@ -6,6 +8,7 @@ namespace Physics.Components
     {
         public uint version;
         public Shape shape;
+        public Vector3 offset;
         public BodyType type;
 
 #if NET
@@ -16,10 +19,11 @@ namespace Physics.Components
         }
 #endif
 
-        public IsBody(Shape shape, BodyType type)
+        public IsBody(Shape shape, BodyType type, Vector3 offset = default)
         {
             version = default;
             this.shape = shape;
+            this.offset = offset;
             this.type = type;
         }
     }

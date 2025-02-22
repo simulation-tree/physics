@@ -1,4 +1,5 @@
 ﻿using Physics.Components;
+using Shapes;
 using System;
 using System.Diagnostics;
 using System.Numerics;
@@ -52,6 +53,7 @@ namespace Physics
 
         public readonly BodyType Type => GetComponent<IsBody>().type;
         public readonly ref Shape Shape => ref GetComponent<IsBody>().shape;
+        public readonly ref Vector3 Offset => ref GetComponent<IsBody>().offset;
         public readonly uint ContactCount => GetArrayLength<CollisionContact>();
         public readonly CollisionContact this[uint index] => GetArrayElement<CollisionContact>(index);
 
@@ -86,7 +88,7 @@ namespace Physics
         {
             this.world = world;
             value = new Transform(world).value;
-            AddComponent(new IsBody(shape, type));
+            AddComponent(new IsBody(shape, type, default));
             if (type != BodyType.Static)
             {
                 AddComponent(new LinearVelocity(initialVelocity));

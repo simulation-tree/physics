@@ -16,6 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\shapes\source\Shapes.csproj" />
 		<ProjectReference Include="..\..\worlds\core\Worlds.Core.csproj" />
 		<ProjectReference Include="..\..\transforms\source\Transforms.csproj" />
 		<ProjectReference Include="..\..\types\generator\Types.Generator.csproj">
