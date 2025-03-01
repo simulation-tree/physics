@@ -1,5 +1,4 @@
-﻿using Collections.Generic;
-using Physics.Components;
+﻿using Physics.Components;
 using Shapes;
 using System;
 using System.Diagnostics;
@@ -62,7 +61,7 @@ namespace Physics
         {
             get
             {
-                if (TryGetArray(out Array<CollisionContact> contacts))
+                if (TryGetArray(out Values<CollisionContact> contacts))
                 {
                     return contacts.AsSpan();
                 }
