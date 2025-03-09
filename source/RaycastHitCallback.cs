@@ -1,6 +1,5 @@
 ﻿using Physics.Events;
 using System;
-using Unmanaged;
 using Worlds;
 
 namespace Physics.Functions
@@ -8,24 +7,24 @@ namespace Physics.Functions
     public unsafe readonly struct RaycastHitCallback : IEquatable<RaycastHitCallback>
     {
 #if NET
-        private readonly delegate* unmanaged<World, RaycastRequest, RaycastHit*, uint, void> callback;
+        private readonly delegate* unmanaged<Input, void> callback;
 
-        public RaycastHitCallback(delegate* unmanaged<World, RaycastRequest, RaycastHit*, uint, void> callback)
+        public RaycastHitCallback(delegate* unmanaged<Input, void> callback)
         {
             this.callback = callback;
         }
 #else
-        private readonly delegate*<World, Raycast, RaycastHit*, uint, void> callback;
+        private readonly delegate*<Input, void> callback;
 
-        public RaycastHitCallback(delegate*<World, Raycast, RaycastHit*, uint, void> callback)
+        public RaycastHitCallback(delegate*<Input, void> callback)
         {
             this.callback = callback;
         }
 #endif
 
-        public readonly void Invoke(World world, RaycastRequest raycast, USpan<RaycastHit> hits)
+        public readonly void Invoke(World world, RaycastRequest raycast, Span<RaycastHit> hits)
         {
-            callback(world, raycast, (RaycastHit*)hits.Address, hits.Length);
+            callback(new(world, raycast, hits));
         }
 
         public readonly override bool Equals(object? obj)
@@ -51,6 +50,25 @@ namespace Physics.Functions
         public static bool operator !=(RaycastHitCallback left, RaycastHitCallback right)
         {
             return !(left == right);
+        }
+
+        public readonly struct Input
+        {
+            public readonly World world;
+            public readonly RaycastRequest request;
+
+            private readonly RaycastHit* pointer;
+            private readonly int length;
+
+            public readonly ReadOnlySpan<RaycastHit> Hits => new(pointer, length);
+
+            public Input(World world, RaycastRequest raycast, Span<RaycastHit> hits)
+            {
+                this.world = world;
+                this.request = raycast;
+                pointer = hits.GetPointer();
+                length = hits.Length;
+            }
         }
     }
 }

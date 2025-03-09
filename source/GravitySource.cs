@@ -3,7 +3,6 @@ using System;
 using System.Numerics;
 using Transforms;
 using Transforms.Components;
-using Unmanaged;
 using Worlds;
 
 namespace Physics
@@ -28,38 +27,38 @@ namespace Physics
 
         public readonly override string ToString()
         {
-            USpan<char> buffer = stackalloc char[64];
-            uint length = ToString(buffer);
-            return buffer.GetSpan(length).ToString();
+            Span<char> buffer = stackalloc char[64];
+            int length = ToString(buffer);
+            return buffer.Slice(0, length).ToString();
         }
 
-        public readonly uint ToString(USpan<char> buffer)
+        public readonly int ToString(Span<char> destination)
         {
-            uint length = 0;
+            int length = 0;
             if (IsDirectional)
             {
                 Quaternion rotation = As<Transform>().WorldRotation;
-                USpan<char> template = "Directional Gravity(".AsSpan();
-                template.CopyTo(buffer);
+                ReadOnlySpan<char> template = "Directional Gravity(";
+                template.CopyTo(destination);
                 length += template.Length;
                 Vector3 direction = Vector3.Transform(Vector3.UnitZ, rotation);
-                length += direction.ToString(buffer.Slice(length));
-                buffer[length++] = ',';
-                buffer[length++] = ' ';
-                length += Force.ToString(buffer.Slice(length));
-                buffer[length++] = ')';
+                length += direction.ToString(destination.Slice(length));
+                destination[length++] = ',';
+                destination[length++] = ' ';
+                length += Force.ToString(destination.Slice(length));
+                destination[length++] = ')';
             }
             else
             {
                 Vector3 position = As<Transform>().WorldPosition;
-                USpan<char> template = "Point Gravity(".AsSpan();
-                template.CopyTo(buffer);
+                ReadOnlySpan<char> template = "Point Gravity(";
+                template.CopyTo(destination);
                 length += template.Length;
-                length += position.ToString(buffer.Slice(length));
-                buffer[length++] = ',';
-                buffer[length++] = ' ';
-                length += Force.ToString(buffer.Slice(length));
-                buffer[length++] = ')';
+                length += position.ToString(destination.Slice(length));
+                destination[length++] = ',';
+                destination[length++] = ' ';
+                length += Force.ToString(destination.Slice(length));
+                destination[length++] = ')';
             }
 
             return length;

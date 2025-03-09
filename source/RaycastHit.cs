@@ -1,5 +1,5 @@
-﻿using System.Numerics;
-using Unmanaged;
+﻿using System;
+using System.Numerics;
 
 namespace Physics
 {
@@ -20,41 +20,41 @@ namespace Physics
 
         public unsafe readonly override string ToString()
         {
-            USpan<char> buffer = stackalloc char[96];
-            uint length = ToString(buffer);
-            return buffer.GetSpan(length).ToString();
+            Span<char> buffer = stackalloc char[96];
+            int length = ToString(buffer);
+            return buffer.Slice(0, length).ToString();
         }
 
-        public readonly uint ToString(USpan<char> buffer)
+        public readonly int ToString(Span<char> destination)
         {
-            uint length = 0;
-            buffer[length++] = 'R';
-            buffer[length++] = 'a';
-            buffer[length++] = 'y';
-            buffer[length++] = 'c';
-            buffer[length++] = 'a';
-            buffer[length++] = 's';
-            buffer[length++] = 't';
-            buffer[length++] = 'H';
-            buffer[length++] = 'i';
-            buffer[length++] = 't';
-            buffer[length++] = '(';
-            length += point.X.ToString(buffer.Slice(length));
-            buffer[length++] = ',';
-            length += point.Y.ToString(buffer.Slice(length));
-            buffer[length++] = ',';
-            length += point.Z.ToString(buffer.Slice(length));
-            buffer[length++] = ',';
-            length += normal.X.ToString(buffer.Slice(length));
-            buffer[length++] = ',';
-            length += normal.Y.ToString(buffer.Slice(length));
-            buffer[length++] = ',';
-            length += normal.Z.ToString(buffer.Slice(length));
-            buffer[length++] = ',';
-            length += distance.ToString(buffer.Slice(length));
-            buffer[length++] = ',';
-            length += entity.ToString(buffer.Slice(length));
-            buffer[length++] = ')';
+            int length = 0;
+            destination[length++] = 'R';
+            destination[length++] = 'a';
+            destination[length++] = 'y';
+            destination[length++] = 'c';
+            destination[length++] = 'a';
+            destination[length++] = 's';
+            destination[length++] = 't';
+            destination[length++] = 'H';
+            destination[length++] = 'i';
+            destination[length++] = 't';
+            destination[length++] = '(';
+            length += point.X.ToString(destination.Slice(length));
+            destination[length++] = ',';
+            length += point.Y.ToString(destination.Slice(length));
+            destination[length++] = ',';
+            length += point.Z.ToString(destination.Slice(length));
+            destination[length++] = ',';
+            length += normal.X.ToString(destination.Slice(length));
+            destination[length++] = ',';
+            length += normal.Y.ToString(destination.Slice(length));
+            destination[length++] = ',';
+            length += normal.Z.ToString(destination.Slice(length));
+            destination[length++] = ',';
+            length += distance.ToString(destination.Slice(length));
+            destination[length++] = ',';
+            length += entity.ToString(destination.Slice(length));
+            destination[length++] = ')';
             return length;
         }
     }

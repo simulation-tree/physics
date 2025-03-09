@@ -4,7 +4,6 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 using Transforms;
-using Unmanaged;
 using Worlds;
 
 namespace Physics
@@ -54,10 +53,10 @@ namespace Physics
         public readonly BodyType Type => GetComponent<IsBody>().type;
         public readonly ref Shape Shape => ref GetComponent<IsBody>().shape;
         public readonly ref Vector3 Offset => ref GetComponent<IsBody>().offset;
-        public readonly uint ContactCount => GetArrayLength<CollisionContact>();
-        public readonly CollisionContact this[uint index] => GetArrayElement<CollisionContact>(index);
+        public readonly int ContactCount => GetArrayLength<CollisionContact>();
+        public readonly CollisionContact this[int index] => GetArrayElement<CollisionContact>(index);
 
-        public readonly USpan<CollisionContact> Contacts
+        public readonly System.Span<CollisionContact> Contacts
         {
             get
             {

@@ -1,8 +1,8 @@
 ﻿using Physics.Components;
+using System;
 using System.Numerics;
 using Transforms;
 using Transforms.Components;
-using Unmanaged;
 using Worlds;
 
 namespace Physics
@@ -42,12 +42,12 @@ namespace Physics
 
         public readonly override string ToString()
         {
-            USpan<char> buffer = stackalloc char[64];
-            uint length = ToString(buffer);
-            return buffer.GetSpan(length).ToString();
+            Span<char> buffer = stackalloc char[64];
+            int length = ToString(buffer);
+            return buffer.Slice(0, length).ToString();
         }
 
-        public readonly uint ToString(USpan<char> buffer)
+        public readonly int ToString(Span<char> buffer)
         {
             return value.ToString(buffer);
         }
