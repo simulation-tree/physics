@@ -56,7 +56,7 @@ namespace Physics
         public readonly int ContactCount => GetArrayLength<CollisionContact>();
         public readonly CollisionContact this[int index] => GetArrayElement<CollisionContact>(index);
 
-        public readonly System.Span<CollisionContact> Contacts
+        public readonly ReadOnlySpan<CollisionContact> Contacts
         {
             get
             {
