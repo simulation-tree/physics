@@ -62,7 +62,7 @@ namespace Physics
             {
                 if (TryGetArray(out Values<CollisionContact> contacts))
                 {
-                    return contacts.AsSpan();
+                    return contacts;
                 }
                 else
                 {
