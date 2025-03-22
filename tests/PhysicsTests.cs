@@ -9,8 +9,8 @@ namespace Physics.Tests
     {
         static PhysicsTests()
         {
-            TypeRegistry.Load<PhysicsTypeBank>();
-            TypeRegistry.Load<TransformsTypeBank>();
+            MetadataRegistry.Load<PhysicsTypeBank>();
+            MetadataRegistry.Load<TransformsTypeBank>();
         }
 
         protected override Schema CreateSchema()
