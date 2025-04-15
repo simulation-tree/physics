@@ -60,6 +60,7 @@ namespace Physics.Functions
             private readonly RaycastHit* pointer;
             private readonly int length;
 
+            public readonly bool Any => length > 0;
             public readonly ReadOnlySpan<RaycastHit> Hits => new(pointer, length);
 
             public Input(World world, RaycastRequest raycast, Span<RaycastHit> hits)
