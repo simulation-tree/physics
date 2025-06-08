@@ -14,7 +14,7 @@
     <Company>simulation-tree</Company>
     <RepositoryUrl>https://github.com/simulation-tree/physics</RepositoryUrl>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <OutDir>bin/$(TargetFramework)/$(Configuration)</OutDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,11 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="bin/Debug/net9.0/Physics.dll" Pack="true" PackagePath="tools/debug/Physics.dll" Visible="false"/>
-    <Content Include="bin/Debug/net9.0/Physics.xml" Pack="true" PackagePath="tools/debug/Physics.xml" Visible="false" Condition="Exists('bin/Debug/net9.0/Physics.xml')"/>
-    <Content Include="bin/Release/net9.0/Physics.dll" Pack="true" PackagePath="tools/release/Physics.dll" Visible="false"/>
-    <Content Include="bin/Release/net9.0/Physics.xml" Pack="true" PackagePath="tools/release/Physics.xml" Visible="false" Condition="Exists('bin/Release/net9.0/Physics.xml')"/>
-    <Content Include="build/Physics.targets" Pack="true" PackagePath="build/Physics.targets" Visible="false"/>
+    <Content Include="bin/**/*" Pack="true" PackagePath="lib" Visible="false"/>
+    <Content Include="buildTransitive/**/*" Pack="true" PackagePath="buildTransitive"/>
   </ItemGroup>
 
 </Project>
