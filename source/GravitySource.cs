@@ -9,11 +9,13 @@ namespace Physics
 {
     public readonly partial struct GravitySource : IEntity
     {
+        public const float DefaultForce = 9.80665f;
+
         public readonly bool IsDirectional => ContainsTag<IsDirectionalGravity>();
         public readonly bool IsPoint => ContainsComponent<IsPointGravity>();
         public readonly ref float Force => ref GetComponent<IsGravitySource>().force;
 
-        public GravitySource(World world, Vector3 position, Quaternion rotation, float force = 9.8067f)
+        public GravitySource(World world, Vector3 position, Quaternion rotation, float force = DefaultForce)
         {
             this.world = world;
             value = new Transform(world, position, rotation, Scale.Default.value).value;
